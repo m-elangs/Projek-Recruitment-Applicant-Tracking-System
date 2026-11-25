@@ -1,0 +1,199 @@
+openapi: 3.1.0
+info:
+  title: TalentFlow ATS REST API
+  version: 1.0.0
+  description: >
+    Enterprise Recruitment & Applicant Tracking System REST API powered by Laravel 10,
+    Laravel Sanctum, Role-Based Access Control (RBAC), and MySQL 8+.
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local Development Server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: SanctumToken
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service healthy
+  /public/jobs:
+    get:
+      summary: List published job vacancies for Careers Portal
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: department_id
+          in: query
+          schema: { type: integer }
+        - name: employment_type
+          in: query
+          schema: { type: string, enum: [full_time, part_time, contract, internship] }
+      responses:
+        '200':
+          description: Paginated list of published vacancies
+  /public/jobs/{slugOrId}:
+    get:
+      summary: Get published job detail
+      parameters:
+        - name: slugOrId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Job details
+  /auth/register:
+    post:
+      summary: Register a new Candidate account and linked candidate profile
+      responses:
+        '201':
+          description: Candidate registered
+  /auth/login:
+    post:
+      summary: Sign in (System Admin, Recruiter, Hiring Manager, Candidate)
+      responses:
+        '200':
+          description: Authenticated user, permissions, redirect target, and Sanctum token
+  /auth/logout:
+    post:
+      summary: Sign out and revoke token/session
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Signed out
+  /auth/me:
+    get:
+      summary: Get authenticated user profile and RBAC permissions
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Current user object
+  /dashboard:
+    get:
+      summary: Internal ATS Dashboard KPIs, Funnel, and Hiring Performance
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Dashboard payload
+  /jobs:
+    get:
+      summary: List internal job vacancies (scoped for Hiring Managers)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Paginated jobs
+    post:
+      summary: Create a new job vacancy
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Job created
+  /jobs/{id}/publish:
+    patch:
+      summary: Publish a draft or paused job vacancy
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Job published
+  /candidates:
+    get:
+      summary: Search candidate directory
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Paginated candidates
+    post:
+      summary: Add a sourced candidate with duplicate email detection
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Candidate created
+        '409':
+          description: Duplicate email detected
+  /documents/{id}/download:
+    get:
+      summary: Policy-protected download of private candidate CV/document
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Binary file stream
+        '403':
+          description: Unauthorized document access
+  /applications/pipeline:
+    get:
+      summary: Get 9-stage Kanban board grouped by recruitment stage
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Kanban columns
+  /applications/{id}/stage:
+    patch:
+      summary: Validate and execute pipeline stage transition with audit history
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Stage updated
+        '422':
+          description: Invalid stage transition or missing rejection reason
+  /interviews:
+    get:
+      summary: List scheduled interviews
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Paginated interviews
+    post:
+      summary: Schedule interview and assign panel interviewers
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Interview scheduled
+  /interviews/{id}/evaluations:
+    post:
+      summary: Submit 5-dimension (1-5) structured interview evaluation
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Evaluation recorded
+        '403':
+          description: Only assigned interviewers or admins may submit evaluations
+  /job-offers:
+    get:
+      summary: List job offers
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Paginated job offers
+    post:
+      summary: Create job offer
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Offer created
+  /portal/offers/{id}/respond:
+    patch:
+      summary: Candidate accepts (auto-transitions to Hired) or declines job offer
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Offer response recorded
+  /reports:
+    get:
+      summary: Complete recruitment analytics (Conversion, Time-to-Hire, Funnel, Sources, Departments)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Analytics report
+  /admin/activity-logs:
+    get:
+      summary: Immutable system audit logs (System Administrator only)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Paginated audit logs

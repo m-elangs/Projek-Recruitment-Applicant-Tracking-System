@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+build/
+frontend/dist/
+backend/public/build/
+backend/public/hot
+backend/public/storage
+
+# Laravel storage & cache
+backend/storage/*.key
+backend/storage/logs/*.log
+backend/storage/framework/cache/*
+!backend/storage/framework/cache/.gitignore
+backend/storage/framework/sessions/*
+!backend/storage/framework/sessions/.gitignore
+backend/storage/framework/testing/*
+!backend/storage/framework/testing/.gitignore
+backend/storage/framework/views/*
+!backend/storage/framework/views/.gitignore
+backend/storage/app/private/*
+!backend/storage/app/private/.gitignore
+backend/bootstrap/cache/*.php
+
+# Testing & tool caches
+.phpunit.result.cache
+backend/.phpunit.result.cache
+coverage/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

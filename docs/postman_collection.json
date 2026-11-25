@@ -1,0 +1,57 @@
+{
+  "info": {
+    "name": "TalentFlow ATS API v1",
+    "description": "Complete REST API collection for TalentFlow Recruitment & Applicant Tracking System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000/api/v1" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth — Login (Recruiter)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json?.data?.token) { pm.collectionVariables.set('token', json.data.token); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"recruiter@talentflow.local\",\n  \"password\": \"Password123!\"\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      }
+    },
+    {
+      "name": "Public — List Published Jobs",
+      "request": { "method": "GET", "url": "{{baseUrl}}/public/jobs" }
+    },
+    {
+      "name": "Dashboard — Internal KPIs",
+      "request": { "method": "GET", "url": "{{baseUrl}}/dashboard" }
+    },
+    {
+      "name": "Pipeline — Kanban Board",
+      "request": { "method": "GET", "url": "{{baseUrl}}/applications/pipeline" }
+    },
+    {
+      "name": "Reports — Full Analytics",
+      "request": { "method": "GET", "url": "{{baseUrl}}/reports" }
+    }
+  ]
+}
